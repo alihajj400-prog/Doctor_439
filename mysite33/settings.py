@@ -12,42 +12,42 @@ import os
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # ----------------------------------------------------
-# LOAD .env FILE(S)
+# LOAD .env (supports root/.env or mysite33/.env)
 # ----------------------------------------------------
-# Tries both: project/.env and project/mysite33/.env
-for env_file in (BASE_DIR / ".env", BASE_DIR / "mysite33" / ".env"):
-    if env_file.exists():
-        load_dotenv(env_file, override=True)
+for env_path in (BASE_DIR / ".env", BASE_DIR / "mysite33" / ".env"):
+    if env_path.exists():
+        load_dotenv(env_path, override=True)
 
 # ----------------------------------------------------
-# OPENAI KEY (loaded from .env)
+# OPENAI API KEY
 # ----------------------------------------------------
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 if not OPENAI_API_KEY:
-    print("⚠️ WARNING: OPENAI_API_KEY is missing! Check your .env file.")
+    print("⚠️ WARNING: OPENAI_API_KEY is missing. Add it to your .env file.")
 
 # ----------------------------------------------------
 # BASIC DJANGO SETTINGS
 # ----------------------------------------------------
 SECRET_KEY = "django-insecure-*)ivux&@=t5v3uoh&#ozr1vvy3omnf%w1j5%w!_ktm*7359pl%"
 
-# For Azure production, keep DEBUG = False
+# Azure production requires DEBUG = False
 DEBUG = False
 
-# Use the real Azure host:
-# doctor439webapp-cuaje0h0bzeggsax.canadacentral-01.azurewebsites.net
+# REAL Azure hostname
+AZURE_HOST = "doctor439webapp-cuaje0h0bzeggsax.canadacentral-01.azurewebsites.net"
+
 ALLOWED_HOSTS = [
-    "doctor439webapp-cuaje0h0bzeggsax.canadacentral-01.azurewebsites.net",
-    "127.0.0.1",
+    AZURE_HOST,
     "localhost",
+    "127.0.0.1",
 ]
 
 CSRF_TRUSTED_ORIGINS = [
-    "https://doctor439webapp-cuaje0h0bzeggsax.canadacentral-01.azurewebsites.net",
+    f"https://{AZURE_HOST}",
 ]
 
 # ----------------------------------------------------
-# APPS
+# INSTALLED APPS
 # ----------------------------------------------------
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -56,6 +56,8 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+
+    # your app
     "myapp33.apps.Myapp33Config",
 ]
 
@@ -106,12 +108,12 @@ DATABASES = {
 }
 
 # ----------------------------------------------------
-# PASSWORDS
+# PASSWORD VALIDATION
 # ----------------------------------------------------
 AUTH_PASSWORD_VALIDATORS = []
 
 # ----------------------------------------------------
-# LANGUAGE & TIMEZONE
+# INTERNATIONALIZATION
 # ----------------------------------------------------
 LANGUAGE_CODE = "en-us"
 TIME_ZONE = "UTC"
@@ -119,13 +121,12 @@ USE_I18N = True
 USE_TZ = True
 
 # ----------------------------------------------------
-# STATIC FILES
+# STATIC FILES (Azure requires STATIC_ROOT)
 # ----------------------------------------------------
-STATIC_URL = "static/"
-# Folder where 'collectstatic' will put files for Azure
+STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
 # ----------------------------------------------------
-# PRIMARY KEY FIELD
+# DEFAULT FIELD TYPE
 # ----------------------------------------------------
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"

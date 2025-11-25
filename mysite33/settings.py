@@ -14,6 +14,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # ----------------------------------------------------
 # LOAD .env FILE(S)
 # ----------------------------------------------------
+# Tries both: project/.env and project/mysite33/.env
 for env_file in (BASE_DIR / ".env", BASE_DIR / "mysite33" / ".env"):
     if env_file.exists():
         load_dotenv(env_file, override=True)
@@ -29,8 +30,20 @@ if not OPENAI_API_KEY:
 # BASIC DJANGO SETTINGS
 # ----------------------------------------------------
 SECRET_KEY = "django-insecure-*)ivux&@=t5v3uoh&#ozr1vvy3omnf%w1j5%w!_ktm*7359pl%"
-DEBUG = True
-ALLOWED_HOSTS = ["*"]
+
+# For Azure production, keep DEBUG = False
+DEBUG = False
+
+# Replace "doctor439webapp" if your Azure app name is different
+ALLOWED_HOSTS = [
+    "doctor439webapp.azurewebsites.net",
+    "127.0.0.1",
+    "localhost",
+]
+
+CSRF_TRUSTED_ORIGINS = [
+    "https://doctor439webapp.azurewebsites.net",
+]
 
 # ----------------------------------------------------
 # APPS
@@ -108,6 +121,8 @@ USE_TZ = True
 # STATIC FILES
 # ----------------------------------------------------
 STATIC_URL = "static/"
+# Folder where 'collectstatic' will put files for Azure
+STATIC_ROOT = BASE_DIR / "staticfiles"
 
 # ----------------------------------------------------
 # PRIMARY KEY FIELD

@@ -1,60 +1,20 @@
-"""
-Django settings for mysite33 project.
-"""
-
-from pathlib import Path
-from dotenv import load_dotenv
 import os
+from pathlib import Path
 
-# ----------------------------------------------------
-# PATHS
-# ----------------------------------------------------
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# ----------------------------------------------------
-# LOAD .env FILE(S)
-# ----------------------------------------------------
-for env_file in (BASE_DIR / ".env", BASE_DIR / "mysite33" / ".env"):
-    if env_file.exists():
-        load_dotenv(env_file, override=True)
-
-# ----------------------------------------------------
-# SMALL HELPERS
-# ----------------------------------------------------
-def env_bool(name: str, default: bool = False) -> bool:
-    val = os.getenv(name)
-    if val is None:
-        return default
-    return val.lower() in ("1", "true", "yes", "on")
-
-# ----------------------------------------------------
-# BASIC DJANGO SETTINGS
-# ----------------------------------------------------
-SECRET_KEY = "django-insecure-*)ivux&@=t5v3uoh&#ozr1vvy3omnf%w1j5%w!_ktm*7359pl%"
-
-# Default False, but can be turned ON from Azure with DJANGO_DEBUG=1
-DEBUG = env_bool("DJANGO_DEBUG", default=False)
+SECRET_KEY = "django-insecure-key"
+DEBUG = False
 
 ALLOWED_HOSTS = [
-    "doctor439webapp-cuaje0h0bzeggsax.canadacentral-01.azurewebsites.net",
-    "127.0.0.1",
+    "*",
     "localhost",
+    "127.0.0.1",
 ]
 
-CSRF_TRUSTED_ORIGINS = [
-    "https://doctor439webapp-cuaje0h0bzeggsax.canadacentral-01.azurewebsites.net",
-]
-
-# ----------------------------------------------------
-# OPENAI KEY
-# ----------------------------------------------------
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
-if not OPENAI_API_KEY:
-    print("⚠️ WARNING: OPENAI_API_KEY is missing! Check Azure App Settings or .env.")
-
-# ----------------------------------------------------
-# APPS
-# ----------------------------------------------------
+# -----------------------
+# Applications
+# -----------------------
 INSTALLED_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
@@ -62,12 +22,10 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    "myapp33.apps.Myapp33Config",
+
+    "myapp33",   # your app
 ]
 
-# ----------------------------------------------------
-# MIDDLEWARE
-# ----------------------------------------------------
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
@@ -78,9 +36,6 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
-# ----------------------------------------------------
-# URLS / TEMPLATES
-# ----------------------------------------------------
 ROOT_URLCONF = "mysite33.urls"
 
 TEMPLATES = [
@@ -101,9 +56,9 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "mysite33.wsgi.application"
 
-# ----------------------------------------------------
+# -----------------------
 # DATABASE
-# ----------------------------------------------------
+# -----------------------
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.sqlite3",
@@ -111,50 +66,35 @@ DATABASES = {
     }
 }
 
-# ----------------------------------------------------
-# PASSWORDS
-# ----------------------------------------------------
-AUTH_PASSWORD_VALIDATORS = []
+# -----------------------
+# Password validation
+# -----------------------
+AUTH_PASSWORD_VALIDATORS = [
+    {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
+    {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator"},
+    {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"},
+    {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
+]
 
-# ----------------------------------------------------
-# LANGUAGE & TIMEZONE
-# ----------------------------------------------------
+# -----------------------
+# Internationalization
+# -----------------------
 LANGUAGE_CODE = "en-us"
 TIME_ZONE = "UTC"
 USE_I18N = True
 USE_TZ = True
 
-# ----------------------------------------------------
-# STATIC FILES
-# ----------------------------------------------------
-STATIC_URL = "static/"
+# -----------------------
+# STATIC FILES FOR AZURE
+# -----------------------
+STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
-# ----------------------------------------------------
-# LOGGING – send errors to console (Azure Log Stream)
-# ----------------------------------------------------
-LOGGING = {
-    "version": 1,
-    "disable_existing_loggers": False,
-    "handlers": {
-        "console": {
-            "class": "logging.StreamHandler",
-        },
-    },
-    "root": {
-        "handlers": ["console"],
-        "level": "INFO",
-    },
-    "loggers": {
-        "django": {
-            "handlers": ["console"],
-            "level": "ERROR",
-            "propagate": True,
-        },
-    },
-}
+STATICFILES_DIRS = [
+    BASE_DIR / "static",
+]
 
-# ----------------------------------------------------
-# PRIMARY KEY FIELD
-# ----------------------------------------------------
+# -----------------------
+# DEFAULTS
+# -----------------------
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"

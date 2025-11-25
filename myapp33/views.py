@@ -1,14 +1,18 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
+from django.contrib import messages
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_POST
+
 from .models import Contact
 from .forms import ContactForm, AppointmentRequestForm
-from django.contrib import messages
+
 import csv
 import os
 import re
 from difflib import get_close_matches
 from urllib.parse import quote_plus
-from django.views.decorators.csrf import csrf_exempt
+
 
 SPECIALTY_RULES = [
     {
@@ -276,22 +280,23 @@ DEFAULT_SPECIALTIES = [rule["name"] for rule in SPECIALTY_RULES[:8]]
 
 def detect_specialty(user_msg: str):
     text = user_msg.lower()
-    if len(text.strip()) <= 3:
-        return None
-    quick_greetings = {"hi", "hello", "hey", "hola", "bonjour"}
-    if text.strip() in quick_greetings:
-        return None
+
+    # 1) direct specialty name
     for rule in SPECIALTY_RULES:
         if rule["name"].lower() in text:
             return rule
+
+    # 2) keyword rules
     for rule in SPECIALTY_RULES:
         if any(keyword in text for keyword in rule["keywords"]):
             return rule
 
+    # 3) explicit aliases
     for term, specialty_name in SPECIALTY_ALIASES.items():
         if term in text:
             return SPECIALTY_NAME_MAP.get(specialty_name.lower())
 
+    # 4) fuzzy matching on specialty names
     words = re.findall(r"[a-zA-Z]+", text)
     names = list(SPECIALTY_NAME_MAP.keys())
     for token in words:
@@ -300,10 +305,8 @@ def detect_specialty(user_msg: str):
         close = get_close_matches(token, names, n=1, cutoff=0.78)
         if close:
             return SPECIALTY_NAME_MAP[close[0]]
-        close = get_close_matches(token, names, n=1, cutoff=0.78)
-        if close:
-            return SPECIALTY_NAME_MAP[close[0]]
 
+    # 5) fuzzy on alias keys
     alias_keys = list(SPECIALTY_ALIASES.keys())
     for token in words:
         if len(token) < 4:
@@ -313,6 +316,7 @@ def detect_specialty(user_msg: str):
             specialty_name = SPECIALTY_ALIASES[close[0]]
             return SPECIALTY_NAME_MAP.get(specialty_name.lower())
 
+    # 6) default
     return SPECIALTY_NAME_MAP.get("general medicine")
 
 
@@ -340,6 +344,9 @@ def detect_budget(user_msg: str):
     return None
 
 
+# -------------------------------------------------------
+# CHATBOT (POST from JS) – CSRF exempt
+# -------------------------------------------------------
 @csrf_exempt
 def chatbot(request):
     if request.method != "POST":
@@ -404,8 +411,9 @@ def chatbot(request):
             )
         else:
             reply = (
-                "Hi there! Tell me about a symptom, a body part, or the type of doctor you want (for example "
-                "'rash on arm', 'dentist in Beirut', 'budget under 600') and I’ll point you to the best fits."
+                "Hi there! Tell me about a symptom, a body part, or the type of doctor you want "
+                "(for example 'rash on arm', 'dentist in Beirut', 'budget under 600') and I’ll "
+                "point you to the best fits."
             )
 
         return JsonResponse({"reply": reply})
@@ -415,7 +423,7 @@ def chatbot(request):
 
 
 # -------------------------------------------------------
-# HOME (CREATE + LIST)
+# FAVORITES UTIL
 # -------------------------------------------------------
 def get_favorite_ids(request):
     return set(request.session.get("favorite_doctors", []))
@@ -426,52 +434,66 @@ def save_favorite_ids(request, ids):
     request.session.modified = True
 
 
+# -------------------------------------------------------
+# HOME (CREATE + LIST) – CSRF exempt to avoid 403 on Azure
+# -------------------------------------------------------
+@csrf_exempt
 def home(request):
     query = request.GET.get("search", "").strip()
-    if request.method == 'POST':
+
+    if request.method == "POST":
         form = ContactForm(request.POST)
         if form.is_valid():
             form.save()
-            return redirect('home')
+            return redirect("home")
     else:
         form = ContactForm()
 
-    contacts = Contact.objects.order_by('-id')
+    contacts = Contact.objects.order_by("-id")
     if query:
         contacts = contacts.filter(name__icontains=query)
 
     favorites = get_favorite_ids(request)
+
     return render(
         request,
-        'myapp33/createcontact.html',
-        {'form': form, 'contacts': contacts, 'favorites': favorites, 'search': query}
+        "myapp33/createcontact.html",
+        {
+            "form": form,
+            "contacts": contacts,
+            "favorites": favorites,
+            "search": query,
+        },
     )
 
 
 # -------------------------------------------------------
-# EDIT CONTACT
+# EDIT CONTACT – CSRF exempt
 # -------------------------------------------------------
+@csrf_exempt
 def edit_contact(request, pk):
     contact = get_object_or_404(Contact, pk=pk)
 
-    if request.method == 'POST':
+    if request.method == "POST":
         form = ContactForm(request.POST, instance=contact)
         if form.is_valid():
             form.save()
-            return redirect('home')
+            return redirect("home")
     else:
         form = ContactForm(instance=contact)
 
-    return render(request, 'myapp33/editcontact.html', {'form': form, 'contact': contact})
+    return render(request, "myapp33/editcontact.html", {"form": form, "contact": contact})
 
 
 # -------------------------------------------------------
-# DELETE CONTACT
+# DELETE CONTACT – POST only + CSRF exempt
 # -------------------------------------------------------
+@csrf_exempt
+@require_POST
 def delete_contact(request, pk):
     contact = get_object_or_404(Contact, pk=pk)
     contact.delete()
-    return redirect('home')
+    return redirect("home")
 
 
 # -------------------------------------------------------
@@ -479,20 +501,20 @@ def delete_contact(request, pk):
 # -------------------------------------------------------
 def load_doctors(request):
     base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    csv_path = os.path.join(base_dir, 'doctors.csv')
+    csv_path = os.path.join(base_dir, "doctors.csv")
 
-    with open(csv_path, newline='', encoding='utf-8') as f:
+    with open(csv_path, newline="", encoding="utf-8") as f:
         reader = csv.DictReader(f)
         Contact.objects.all().delete()
 
         for row in reader:
             Contact.objects.create(
-                name=row['name'],
-                specialty=row.get('specialty', ''),
-                city=row.get('city', ''),
-                hospital=row.get('hospital', ''),
-                fees=int(row.get('fees', 0)),
-                rating=float(row.get('rating', 0)),
+                name=row["name"],
+                specialty=row.get("specialty", ""),
+                city=row.get("city", ""),
+                hospital=row.get("hospital", ""),
+                fees=int(row.get("fees", 0)),
+                rating=float(row.get("rating", 0)),
             )
 
     return HttpResponse(f"Loaded {Contact.objects.count()} doctors.")
@@ -502,12 +524,12 @@ def load_doctors(request):
 # RECOMMENDATION ENGINE (FILTER + SORT)
 # -------------------------------------------------------
 def recommend_doctors(request):
-    city = request.GET.get('city', '')
-    specialty = request.GET.get('specialty', '')
-    max_fees = request.GET.get('max_fees', '')
-    min_rating = request.GET.get('min_rating', '')
-    sort = request.GET.get('sort', 'rating_desc')
-    query = request.GET.get('search', '').strip()
+    city = request.GET.get("city", "")
+    specialty = request.GET.get("specialty", "")
+    max_fees = request.GET.get("max_fees", "")
+    min_rating = request.GET.get("min_rating", "")
+    sort = request.GET.get("sort", "rating_desc")
+    query = request.GET.get("search", "").strip()
 
     qs = Contact.objects.all()
 
@@ -523,43 +545,53 @@ def recommend_doctors(request):
     if max_fees:
         try:
             qs = qs.filter(fees__lte=int(max_fees))
-        except:
+        except ValueError:
             pass
 
     if min_rating:
         try:
             qs = qs.filter(rating__gte=float(min_rating))
-        except:
+        except ValueError:
             pass
 
-    if sort == 'rating_desc':
-        qs = qs.order_by('-rating')
-    elif sort == 'rating_asc':
-        qs = qs.order_by('rating')
-    elif sort == 'fees_asc':
-        qs = qs.order_by('fees')
-    elif sort == 'fees_desc':
-        qs = qs.order_by('-fees')
+    if sort == "rating_desc":
+        qs = qs.order_by("-rating")
+    elif sort == "rating_asc":
+        qs = qs.order_by("rating")
+    elif sort == "fees_asc":
+        qs = qs.order_by("fees")
+    elif sort == "fees_desc":
+        qs = qs.order_by("-fees")
     else:
-        qs = qs.order_by('-rating')
+        qs = qs.order_by("-rating")
 
-    city_choices = Contact.objects.values_list('city', flat=True).distinct().order_by('city')
-    specialty_choices = Contact.objects.values_list('specialty', flat=True).distinct().order_by('specialty')
+    city_choices = (
+        Contact.objects.values_list("city", flat=True).distinct().order_by("city")
+    )
+    specialty_choices = (
+        Contact.objects.values_list("specialty", flat=True)
+        .distinct()
+        .order_by("specialty")
+    )
 
     favorites = get_favorite_ids(request)
 
-    return render(request, 'myapp33/recommend.html', {
-        'results': qs,
-        'city_choices': city_choices,
-        'specialty_choices': specialty_choices,
-        'city': city,
-        'specialty': specialty,
-        'max_fees': max_fees,
-        'min_rating': min_rating,
-        'sort': sort,
-        'favorites': favorites,
-        'search': query,
-    })
+    return render(
+        request,
+        "myapp33/recommend.html",
+        {
+            "results": qs,
+            "city_choices": city_choices,
+            "specialty_choices": specialty_choices,
+            "city": city,
+            "specialty": specialty,
+            "max_fees": max_fees,
+            "min_rating": min_rating,
+            "sort": sort,
+            "favorites": favorites,
+            "search": query,
+        },
+    )
 
 
 # -------------------------------------------------------
@@ -609,7 +641,9 @@ def doctor_detail(request, pk):
     ]
     insurance_partners = [
         item.strip()
-        for item in (doctor.insurance_partners or "Medicare, Allianz, Bankers").split(",")
+        for item in (doctor.insurance_partners or "Medicare, Allianz, Bankers").split(
+            ","
+        )
         if item.strip()
     ]
 
@@ -643,12 +677,15 @@ def doctor_detail(request, pk):
     )
 
 
+# -------------------------------------------------------
+# TOGGLE FAVORITE – POST only + CSRF exempt
+# -------------------------------------------------------
+@csrf_exempt
+@require_POST
 def toggle_favorite(request, pk):
-    if request.method != "POST":
-        return HttpResponse(status=405)
-
     doctor = get_object_or_404(Contact, pk=pk)
     favorites = get_favorite_ids(request)
+
     if doctor.pk in favorites:
         favorites.remove(doctor.pk)
         messages.info(request, f"Removed {doctor.name} from your shortlist.")
@@ -657,15 +694,23 @@ def toggle_favorite(request, pk):
         messages.success(request, f"Added {doctor.name} to your shortlist.")
 
     save_favorite_ids(request, favorites)
-    redirect_to = request.POST.get("next") or request.META.get("HTTP_REFERER") or "home"
+    redirect_to = (
+        request.POST.get("next")
+        or request.META.get("HTTP_REFERER")
+        or "home"
+    )
     return HttpResponseRedirect(redirect_to)
 
 
+# -------------------------------------------------------
+# FAVORITES LIST PAGE
+# -------------------------------------------------------
 def favorite_list(request):
     favorites = get_favorite_ids(request)
     doctors = Contact.objects.filter(pk__in=favorites)
     selected = request.GET.getlist("compare")[:3]
     compare_doctors = Contact.objects.filter(pk__in=selected)
+
     return render(
         request,
         "myapp33/favorites.html",
@@ -678,6 +723,9 @@ def favorite_list(request):
     )
 
 
+# -------------------------------------------------------
+# HEALTH HUB STATIC CONTENT
+# -------------------------------------------------------
 def health_hub(request):
     articles = [
         {

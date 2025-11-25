@@ -34,15 +34,16 @@ SECRET_KEY = "django-insecure-*)ivux&@=t5v3uoh&#ozr1vvy3omnf%w1j5%w!_ktm*7359pl%
 # For Azure production, keep DEBUG = False
 DEBUG = False
 
-# Replace "doctor439webapp" if your Azure app name is different
+# Use the real Azure host:
+# doctor439webapp-cuaje0h0bzeggsax.canadacentral-01.azurewebsites.net
 ALLOWED_HOSTS = [
-    "doctor439webapp.azurewebsites.net",
+    "doctor439webapp-cuaje0h0bzeggsax.canadacentral-01.azurewebsites.net",
     "127.0.0.1",
     "localhost",
 ]
 
 CSRF_TRUSTED_ORIGINS = [
-    "https://doctor439webapp.azurewebsites.net",
+    "https://doctor439webapp-cuaje0h0bzeggsax.canadacentral-01.azurewebsites.net",
 ]
 
 # ----------------------------------------------------

@@ -12,42 +12,48 @@ import os
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # ----------------------------------------------------
-# LOAD .env (supports root/.env or mysite33/.env)
+# LOAD .env FILE(S)
 # ----------------------------------------------------
-for env_path in (BASE_DIR / ".env", BASE_DIR / "mysite33" / ".env"):
-    if env_path.exists():
-        load_dotenv(env_path, override=True)
+for env_file in (BASE_DIR / ".env", BASE_DIR / "mysite33" / ".env"):
+    if env_file.exists():
+        load_dotenv(env_file, override=True)
 
 # ----------------------------------------------------
-# OPENAI API KEY
+# SMALL HELPERS
 # ----------------------------------------------------
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
-if not OPENAI_API_KEY:
-    print("⚠️ WARNING: OPENAI_API_KEY is missing. Add it to your .env file.")
+def env_bool(name: str, default: bool = False) -> bool:
+    val = os.getenv(name)
+    if val is None:
+        return default
+    return val.lower() in ("1", "true", "yes", "on")
 
 # ----------------------------------------------------
 # BASIC DJANGO SETTINGS
 # ----------------------------------------------------
 SECRET_KEY = "django-insecure-*)ivux&@=t5v3uoh&#ozr1vvy3omnf%w1j5%w!_ktm*7359pl%"
 
-# Azure production requires DEBUG = False
-DEBUG = False
-
-# REAL Azure hostname
-AZURE_HOST = "doctor439webapp-cuaje0h0bzeggsax.canadacentral-01.azurewebsites.net"
+# Default False, but can be turned ON from Azure with DJANGO_DEBUG=1
+DEBUG = env_bool("DJANGO_DEBUG", default=False)
 
 ALLOWED_HOSTS = [
-    AZURE_HOST,
-    "localhost",
+    "doctor439webapp-cuaje0h0bzeggsax.canadacentral-01.azurewebsites.net",
     "127.0.0.1",
+    "localhost",
 ]
 
 CSRF_TRUSTED_ORIGINS = [
-    f"https://{AZURE_HOST}",
+    "https://doctor439webapp-cuaje0h0bzeggsax.canadacentral-01.azurewebsites.net",
 ]
 
 # ----------------------------------------------------
-# INSTALLED APPS
+# OPENAI KEY
+# ----------------------------------------------------
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+if not OPENAI_API_KEY:
+    print("⚠️ WARNING: OPENAI_API_KEY is missing! Check Azure App Settings or .env.")
+
+# ----------------------------------------------------
+# APPS
 # ----------------------------------------------------
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -56,8 +62,6 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-
-    # your app
     "myapp33.apps.Myapp33Config",
 ]
 
@@ -108,12 +112,12 @@ DATABASES = {
 }
 
 # ----------------------------------------------------
-# PASSWORD VALIDATION
+# PASSWORDS
 # ----------------------------------------------------
 AUTH_PASSWORD_VALIDATORS = []
 
 # ----------------------------------------------------
-# INTERNATIONALIZATION
+# LANGUAGE & TIMEZONE
 # ----------------------------------------------------
 LANGUAGE_CODE = "en-us"
 TIME_ZONE = "UTC"
@@ -121,12 +125,36 @@ USE_I18N = True
 USE_TZ = True
 
 # ----------------------------------------------------
-# STATIC FILES (Azure requires STATIC_ROOT)
+# STATIC FILES
 # ----------------------------------------------------
-STATIC_URL = "/static/"
+STATIC_URL = "static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
 # ----------------------------------------------------
-# DEFAULT FIELD TYPE
+# LOGGING – send errors to console (Azure Log Stream)
+# ----------------------------------------------------
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+        },
+    },
+    "root": {
+        "handlers": ["console"],
+        "level": "INFO",
+    },
+    "loggers": {
+        "django": {
+            "handlers": ["console"],
+            "level": "ERROR",
+            "propagate": True,
+        },
+    },
+}
+
+# ----------------------------------------------------
+# PRIMARY KEY FIELD
 # ----------------------------------------------------
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"

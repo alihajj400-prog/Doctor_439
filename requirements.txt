@@ -1,5 +1,7 @@
 Django==4.2.25
-gunicorn
-openai==2.8.1
+asgiref==3.10.0
+sqlparse==0.5.3
 python-dotenv==1.2.1
-httpx==0.28.1
+psycopg2==2.9.10
+gunicorn
+openai==1.54.3

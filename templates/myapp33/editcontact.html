@@ -1,0 +1,17 @@
+<!-- templates/myapp33/editcontact.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Edit Contact — {{ contact.name }}</title>
+</head>
+<body>
+  <h2>Edit Contact</h2>
+  <form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Update</button>
+    <a href="{% url 'home' %}">Cancel</a>
+  </form>
+</body>
+</html>

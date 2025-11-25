@@ -1,0 +1,111 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Health Hub | Lebanon Doctor Finder</title>
+    <style>
+        body {
+            background: #f1f5f9;
+            font-family: "Inter", system-ui, sans-serif;
+            margin: 0;
+            padding: 40px 20px;
+            color: #0f172a;
+        }
+        .page {
+            max-width: 1100px;
+            margin: auto;
+        }
+        h1 {
+            font-size: 34px;
+            margin-bottom: 8px;
+        }
+        .subtitle {
+            color: #475569;
+            margin-bottom: 30px;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 18px;
+        }
+        .article {
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 20px 50px rgba(15,23,42,0.08);
+            border: 1px solid rgba(148,163,184,0.2);
+        }
+        .article h2 {
+            margin: 0 0 10px;
+            font-size: 20px;
+        }
+        .article p {
+            margin: 0 0 14px;
+            color: #475569;
+        }
+        .tag {
+            display: inline-flex;
+            align-items: center;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: #0f172a;
+        }
+        .tag::before {
+            content: "";
+            width: 26px;
+            height: 3px;
+            border-radius: 999px;
+            background: linear-gradient(120deg, #38bdf8, #22c55e);
+            margin-right: 8px;
+        }
+        .cta {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: 600;
+            color: #16a34a;
+            text-decoration: none;
+        }
+        .cta::after {
+            content: "→";
+        }
+        .actions {
+            margin-top: 30px;
+            display: flex;
+            gap: 12px;
+        }
+        .btn {
+            border-radius: 999px;
+            border: 1px solid rgba(15,23,42,0.2);
+            padding: 8px 16px;
+            text-decoration: none;
+            color: #0f172a;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+<div class="page">
+    <h1>Health Hub</h1>
+    <p class="subtitle">Curated guides and checklists created with Lebanese doctors to help you prepare with confidence.</p>
+
+    <div class="grid">
+        {% for article in articles %}
+            <div class="article">
+                <span class="tag">{{ article.tag }}</span>
+                <h2>{{ article.title }}</h2>
+                <p>{{ article.summary }}</p>
+                <a class="cta" href="{% url 'recommend_doctors' %}?specialty={{ article.tag|urlencode }}">View doctors</a>
+            </div>
+        {% endfor %}
+    </div>
+
+    <div class="actions">
+        <a class="btn" href="{% url 'home' %}">← Back to directory</a>
+        <a class="btn" href="{% url 'favorite_list' %}">My shortlist</a>
+    </div>
+</div>
+</body>
+</html>

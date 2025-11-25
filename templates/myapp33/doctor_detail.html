@@ -1,0 +1,373 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ doctor.name }} | Digital Clinic Profile</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #0f172a;
+            color: #1f2937;
+        }
+
+        .page {
+            max-width: 1100px;
+            margin: 40px auto 60px;
+            background: #f8fafc;
+            border-radius: 30px;
+            padding: 40px;
+            box-shadow: 0 30px 60px rgba(15, 23, 42, 0.35);
+        }
+
+        .hero {
+            display: grid;
+            grid-template-columns: 220px 1fr;
+            gap: 30px;
+            align-items: center;
+        }
+
+        .hero img {
+            width: 220px;
+            height: 220px;
+            object-fit: cover;
+            border-radius: 26px;
+            border: 6px solid #d1fae5;
+            background: linear-gradient(120deg, #a7f3d0, #6ee7b7);
+        }
+
+        .hero h1 {
+            margin: 0;
+            font-size: 32px;
+            color: #0f172a;
+        }
+
+        .hero-actions {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-top: 18px;
+        }
+
+        .hero-actions form {
+            margin: 0;
+        }
+
+        .tag-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 16px 0;
+        }
+
+        .tag {
+            background: rgba(15, 23, 42, 0.08);
+            border-radius: 999px;
+            padding: 6px 14px;
+            font-size: 13px;
+            color: #0f172a;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 18px;
+            padding: 20px;
+            border: 1px solid rgba(15, 23, 42, 0.08);
+            box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+        }
+
+        .card h3 {
+            margin-top: 0;
+            margin-bottom: 12px;
+            font-size: 18px;
+            color: #0f172a;
+        }
+
+        .list-inline {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .list-inline li {
+            background: #e2e8f0;
+            border-radius: 12px;
+            padding: 6px 10px;
+            font-size: 13px;
+        }
+
+        .reviews {
+            margin-top: 40px;
+        }
+
+        .review {
+            background: white;
+            border-radius: 18px;
+            padding: 16px 20px;
+            border: 1px solid rgba(15, 23, 42, 0.08);
+            margin-bottom: 12px;
+        }
+
+        .review strong {
+            color: #0f172a;
+        }
+
+        .stars {
+            color: #f97316;
+        }
+
+        .similar-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 16px;
+        }
+
+        .similar-card {
+            background: white;
+            border-radius: 18px;
+            padding: 16px;
+            border: 1px solid rgba(15, 23, 42, 0.08);
+        }
+
+        .similar-card h4 {
+            margin: 0 0 6px;
+            font-size: 16px;
+            color: #0f172a;
+        }
+
+        .btn {
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 999px;
+            padding: 10px 18px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            text-decoration: none;
+            transition: 0.2s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(120deg, #22c55e, #16a34a);
+            color: #f0fdf4;
+        }
+
+        .btn-outline {
+            border: 1px solid rgba(15, 23, 42, 0.2);
+            color: #0f172a;
+            background: transparent;
+        }
+
+        form .field {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 12px;
+        }
+
+        form label {
+            font-size: 13px;
+            font-weight: 600;
+            color: #475569;
+            margin-bottom: 4px;
+        }
+
+        form input, form textarea {
+            border-radius: 12px;
+            border: 1px solid rgba(15, 23, 42, 0.1);
+            padding: 10px 12px;
+            font-size: 14px;
+            font-family: inherit;
+        }
+
+        form textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .flash {
+            margin: 20px 0;
+            padding: 12px 16px;
+            border-radius: 12px;
+            background: rgba(34, 197, 94, 0.15);
+            border: 1px solid rgba(34, 197, 94, 0.4);
+            color: #166534;
+        }
+
+        .nav-links {
+            margin-top: 40px;
+            display: flex;
+            gap: 12px;
+        }
+
+        @media (max-width: 720px) {
+            .page {
+                margin: 0;
+                border-radius: 0;
+                padding: 24px;
+            }
+
+            .hero {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+
+            .hero img {
+                margin: 0 auto;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="page">
+    {% if messages %}
+        {% for message in messages %}
+            <div class="flash">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+
+    <section class="hero">
+        <img src="{{ doctor.photo_url|default:'https://images.unsplash.com/photo-1537368910025-700350fe46c7?auto=format&fit=crop&w=600&q=80' }}" alt="{{ doctor.name }}">
+        <div>
+            <h1>{{ doctor.name }}</h1>
+            <p>{{ doctor.description|default:"Trusted physician helping patients across Lebanon with compassionate, personalized care." }}</p>
+            <div class="tag-row">
+                <span class="tag">{{ doctor.specialty }}</span>
+                <span class="tag">{{ doctor.city }}</span>
+                <span class="tag">{{ doctor.hospital|default:"Private Clinic" }}</span>
+                <span class="tag">Rating: {{ doctor.rating }} ★</span>
+                <span class="tag">{{ doctor.experience_years }}+ yrs experience</span>
+            </div>
+            <div class="hero-actions">
+                <a class="btn btn-primary" href="#appointment">Request appointment</a>
+                <form method="post" action="{% url 'toggle_favorite' doctor.pk %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="next" value="{{ request.get_full_path }}">
+                    <button class="btn btn-outline" type="submit">
+                        {% if is_favorite %}Remove from shortlist{% else %}Add to shortlist{% endif %}
+                    </button>
+                </form>
+                <a class="btn btn-outline" href="{{ whatsapp_url }}" target="_blank" rel="noopener">
+                    WhatsApp clinic
+                </a>
+                <a class="btn btn-outline" href="{% url 'recommend_doctors' %}">Back to recommendations</a>
+                <a class="btn btn-outline" href="{% url 'home' %}">Back to directory</a>
+            </div>
+        </div>
+    </section>
+
+    <section class="grid">
+        <div class="card">
+            <h3>Languages</h3>
+            <ul class="list-inline">
+                {% for lang in languages %}
+                    <li>{{ lang }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        <div class="card">
+            <h3>Availability</h3>
+            <p>{{ doctor.availability|default:"Mon – Fri · 9:00 AM – 6:00 PM" }}</p>
+            <p><strong>Phone:</strong> {{ doctor.contact_phone|default:"+961 1 555 123" }}</p>
+            <p><strong>Consultation Fees:</strong> ${{ doctor.fees }}</p>
+        </div>
+        <div class="card">
+            <h3>Insurance Partners</h3>
+            <ul class="list-inline">
+                {% for ins in insurance_partners %}
+                    <li>{{ ins }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </section>
+
+    <section class="grid">
+        <div class="card">
+            <h3>Appointment Request</h3>
+            <form method="post" id="appointment">
+                {% csrf_token %}
+                <div class="field">
+                    <label for="id_patient_name">Full name</label>
+                    {{ appointment_form.patient_name }}
+                </div>
+                <div class="field">
+                    <label for="id_patient_email">Email</label>
+                    {{ appointment_form.patient_email }}
+                </div>
+                <div class="field">
+                    <label for="id_patient_phone">Phone</label>
+                    {{ appointment_form.patient_phone }}
+                </div>
+                <div class="field">
+                    <label for="id_preferred_date">Preferred date/time</label>
+                    {{ appointment_form.preferred_date }}
+                </div>
+                <div class="field">
+                    <label for="id_message">Notes</label>
+                    {{ appointment_form.message }}
+                </div>
+                <button class="btn btn-primary" type="submit">Send request</button>
+            </form>
+        </div>
+
+        <div class="card">
+            <h3>Clinic Highlights</h3>
+            <ul style="padding-left:16px; color:#0f172a; line-height:1.6;">
+                <li>Modern diagnostic equipment and private rooms.</li>
+                <li>Coordinated telehealth follow-ups within 24 hours.</li>
+                <li>WhatsApp reminders and lab result tracking.</li>
+                <li>Partnership with regional hospitals for fast admissions.</li>
+            </ul>
+        </div>
+    </section>
+
+    <section class="reviews">
+        <h3>What patients say</h3>
+        {% for review in reviews %}
+            <div class="review">
+                <div style="display:flex;justify-content:space-between;align-items:center;">
+                    <strong>{{ review.name }}</strong>
+                    <span class="stars">{{ review.rating }} ★</span>
+                </div>
+                <small>{{ review.date }}</small>
+                <p>{{ review.text }}</p>
+            </div>
+        {% empty %}
+            <p>No reviews yet. Be the first to share your experience.</p>
+        {% endfor %}
+    </section>
+
+    <section style="margin-top:40px;">
+        <h3>Similar specialists</h3>
+        <div class="similar-grid">
+            {% for doc in similar_doctors %}
+                <div class="similar-card">
+                    <h4>{{ doc.name }}</h4>
+                    <p>{{ doc.city }} · {{ doc.hospital|default:"Private Clinic" }}</p>
+                    <p>Rating: {{ doc.rating }} ★</p>
+                    <a class="btn btn-outline" href="{% url 'doctor_detail' doc.pk %}">View profile</a>
+                </div>
+            {% empty %}
+                <p>No other doctors saved in this specialty yet.</p>
+            {% endfor %}
+        </div>
+    </section>
+
+    <div class="nav-links">
+        <a class="btn btn-outline" href="{% url 'recommend_doctors' %}">← Recommendation engine</a>
+        <a class="btn btn-outline" href="{% url 'home' %}">← Directory home</a>
+    </div>
+</div>
+</body>
+</html>

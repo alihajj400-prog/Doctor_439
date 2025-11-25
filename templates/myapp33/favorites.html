@@ -1,0 +1,167 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>My Shortlist | Lebanon Doctor Finder</title>
+    <style>
+        body {
+            font-family: "Inter", system-ui, sans-serif;
+            background: #0f172a;
+            color: #e2e8f0;
+            margin: 0;
+            padding: 30px;
+        }
+        .page {
+            max-width: 1100px;
+            margin: auto;
+            background: rgba(15,23,42,0.9);
+            border-radius: 28px;
+            padding: 32px;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.4);
+        }
+        h1 {
+            margin-top: 0;
+            font-size: 28px;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 18px;
+            margin-top: 20px;
+        }
+        .compare-deck {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+        .compare-card {
+            background: rgba(15,23,42,0.85);
+            border-radius: 20px;
+            padding: 20px;
+            border: 1px solid rgba(148,163,184,0.3);
+        }
+        .compare-card h3 {
+            margin: 0 0 8px;
+            font-size: 20px;
+        }
+        .card {
+            background: rgba(15,23,42,0.85);
+            border-radius: 20px;
+            padding: 18px;
+            border: 1px solid rgba(148,163,184,0.3);
+        }
+        .card h2 {
+            margin: 0 0 4px;
+            font-size: 18px;
+        }
+        .tag {
+            display: inline-flex;
+            border-radius: 999px;
+            border: 1px solid rgba(148,163,184,0.4);
+            padding: 4px 10px;
+            font-size: 12px;
+            margin-right: 6px;
+        }
+        .btn {
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            padding: 8px 16px;
+            border-radius: 999px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            text-decoration: none;
+        }
+        .btn-primary {
+            background: linear-gradient(120deg, #22c55e, #16a34a);
+            color: #022c22;
+        }
+        .btn-outline {
+            border: 1px solid rgba(148,163,184,0.5);
+            color: #e2e8f0;
+            background: transparent;
+        }
+        .empty {
+            padding: 30px;
+            border: 1px dashed rgba(148,163,184,0.5);
+            border-radius: 18px;
+            text-align: center;
+            color: #94a3b8;
+        }
+    </style>
+</head>
+<body>
+<div class="page">
+    <h1>My Shortlist</h1>
+    <p>Save your favorite specialists for quick access and easy comparisons.</p>
+
+    {% if doctors %}
+        <form method="get" style="margin-bottom:18px;display:flex;gap:10px;align-items:center;">
+            <label style="font-size:14px;">Select doctors to compare (up to 3):</label>
+            <select name="compare" multiple size="3" style="flex:1;border-radius:12px;padding:8px;border:1px solid rgba(148,163,184,0.4);background:rgba(15,23,42,0.6);color:#e2e8f0;">
+                {% for doctor in doctors %}
+                    <option value="{{ doctor.pk }}" {% if doctor.pk|stringformat:"s" in selected_compare %}selected{% endif %}>{{ doctor.name }} — {{ doctor.specialty }}</option>
+                {% endfor %}
+            </select>
+            <button class="btn btn-primary" type="submit" style="color:#022c22;">Compare</button>
+        </form>
+
+        {% if compare_doctors %}
+            <div class="compare-deck">
+                {% for doc in compare_doctors %}
+                    <div class="compare-card">
+                        <h3>{{ doc.name }}</h3>
+                        <p>{{ doc.specialty }} · {{ doc.city }}</p>
+                        <p><strong>Hospital:</strong> {{ doc.hospital|default:"Private Clinic" }}</p>
+                        <p><strong>Fees:</strong> ${{ doc.fees }}</p>
+                        <p><strong>Rating:</strong> {{ doc.rating }}★</p>
+                        <p><strong>Experience:</strong> {{ doc.experience_years }} yrs</p>
+                        <p><strong>Languages:</strong> {{ doc.languages|default:"Arabic, English" }}</p>
+                        <p><strong>Availability:</strong> {{ doc.availability|default:"Mon-Fri 9-6" }}</p>
+                        <p><strong>Insurance:</strong> {{ doc.insurance_partners|default:"N/A" }}</p>
+                        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:10px;">
+                            <a class="btn btn-primary" href="{% url 'doctor_detail' doc.pk %}">View profile</a>
+                            <a class="btn btn-outline" href="https://wa.me/?text={{ doc.name|urlencode }}%20via%20Lebanon%20Doctor%20Finder" target="_blank">WhatsApp</a>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <div class="grid">
+            {% for doctor in doctors %}
+                <div class="card">
+                    <h2>{{ doctor.name }}</h2>
+                    <p>{{ doctor.specialty }} · {{ doctor.city }}</p>
+                    <p>
+                        <span class="tag">Rating {{ doctor.rating }}★</span>
+                        <span class="tag">${{ doctor.fees }}</span>
+                        <span class="tag">{{ doctor.experience_years }} yrs exp.</span>
+                    </p>
+                    <div style="display:flex;gap:10px;flex-wrap:wrap;">
+                        <a class="btn btn-primary" href="{% url 'doctor_detail' doctor.pk %}">View profile</a>
+                        <form method="post" action="{% url 'toggle_favorite' doctor.pk %}">
+                            {% csrf_token %}
+                            <input type="hidden" name="next" value="{% url 'favorite_list' %}">
+                            <button class="btn btn-outline" type="submit">Remove</button>
+                        </form>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty">
+            No doctors in your shortlist yet. Go back to the directory and tap “Favorite” on doctors you trust.
+        </div>
+    {% endif %}
+
+    <div style="margin-top:30px;display:flex;gap:10px;flex-wrap:wrap;">
+        <a class="btn btn-outline" href="{% url 'home' %}">← Back to directory</a>
+        <a class="btn btn-outline" href="{% url 'recommend_doctors' %}">Recommendation engine</a>
+    </div>
+</div>
+</body>
+</html>

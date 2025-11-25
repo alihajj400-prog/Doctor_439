@@ -1,0 +1,173 @@
+name,specialty,city,hospital,fees,rating
+Dr. Sarah Khalil,Cardiology,Beirut,AUBMC,1500,4.8
+Dr. Hadi Mansour,Orthopedics,Beirut,Clemenceau Medical Center,1200,4.6
+Dr. Layal Fakhoury,Dermatology,Beirut,LAU Medical Center,900,4.9
+Dr. Rami Chidiac,Neurosurgery,Jounieh,Notre Dame de Secours,2000,4.7
+Dr. Nadine Maalouf,Pediatrics,Zahle,Zahle Medical Center,500,4.5
+Dr. Tony Hakim,Dentistry,Tripoli,Tripoli Dental Hospital,300,4.4
+Dr. Mira El Hajj,ENT (Otolaryngology),Beirut,Mount Lebanon Hospital,700,4.7
+Dr. Charbel Nassar,General Surgery,Byblos,Ottoman Hospital,1100,4.3
+Dr. Nour Saade,Gynecology,Saida,Saida Governmental Hospital,800,4.6
+Dr. Firas Daher,Cardiology,Tyre,Tyre Medical Center,950,4.2
+Dr. Jana Abou Jaoude,Psychiatry,Beirut,Geitaoui Hospital,1300,4.8
+Dr. Wissam Baydoun,Urology,Beirut,Clemenceau Medical Center,1400,4.5
+Dr. Joelle Chammas,Endocrinology,Baalbek,Baalbek Medical Center,1000,4.7
+Dr. Rayan Khatib,Orthopedics,Tripoli,Tripoli Medical Center,1100,4.6
+Dr. Rita Nader,Dermatology,Byblos,Byblos Skin Clinic,850,4.9
+Dr. Elie Azar,General Medicine,Beirut,AUBMC,600,4.4
+Dr. Hana Sabra,Pediatrics,Saida,Saida Children’s Hospital,550,4.5
+Dr. Mark Fadel,Neurology,Beirut,Mount Lebanon Hospital,1600,4.7
+Dr. Samer Abdallah,Plastic Surgery,Beirut,LAU Medical Center,2200,4.9
+Dr. Leila Tahan,Rheumatology,Jounieh,Keserwan Medical Center,900,4.3
+Dr. Omar Hamade,Cardiology,Beirut,Rafic Hariri Hospital,1100,4.5
+Dr. Lina Barakat,Neurology,Beirut,Geitaoui Hospital,1700,4.9
+Dr. Charbel Rahme,Orthopedics,Zgharta,Ehden Hospital,1000,4.4
+Dr. Maya Khoury,Dermatology,Saida,Saida Dermatology Center,700,4.8
+Dr. Ahmad Kassir,Pediatrics,Tripoli,Tripoli Children Hospital,600,4.6
+Dr. Rayan Haddad,ENT,Jounieh,Keserwan Medical Center,950,4.7
+Dr. Mira Issa,Gynecology,Beirut,AUBMC,1800,4.9
+Dr. Nabil Aridi,Urology,Baalbek,Baalbek Medical Center,1300,4.3
+Dr. Tania Fares,General Surgery,Byblos,Byblos Medical Center,1500,4.8
+Dr. Elie Antoun,Plastic Surgery,Beirut,Clemenceau,2300,4.9
+Dr. Jad Abou Rjeily,Cardiology,Jounieh,Keserwan Medical Center,1200,4.6
+Dr. Hala Choueiri,Dermatology,Beirut,LAU Medical Center,950,4.8
+Dr. Karim Dagher,Orthopedics,Zahle,Zahle Medical Center,1100,4.5
+Dr. Rima Tawk,Pediatrics,Byblos,Byblos Medical Center,700,4.7
+Dr. Sami Baroud,Neurology,Beirut,AUBMC,1800,4.9
+Dr. Rita Arslan,Dentistry,Beirut,Smile Experts Clinic,300,4.6
+Dr. Alaa Mroueh,General Surgery,Saida,Saida Governmental Hospital,1400,4.3
+Dr. Nour Hamwi,Gynecology,Beirut,Clemenceau Medical Center,1700,4.8
+Dr. Ziad Berro,ENT (Otolaryngology),Tripoli,Tripoli Medical Center,900,4.4
+Dr. Leila Farhat,Psychiatry,Beirut,Geitaoui Hospital,1500,4.7
+Dr. Tony Abillama,Urology,Jounieh,Notre Dame De Secours,1350,4.5
+Dr. Joelle Rached,Endocrinology,Beirut,AUBMC,1300,4.9
+Dr. Elie Safadi,Neurosurgery,Byblos,Ottoman Hospital,2100,4.8
+Dr. Rana Hatem,Rheumatology,Jounieh,Keserwan Medical Center,950,4.4
+Dr. Omar Chamseddine,General Medicine,Tripoli,Tripoli Health Center,600,4.2
+Dr. Hiba Assaf,Pediatrics,Baalbek,Baalbek Medical Center,650,4.5
+Dr. Nadim Bechara,Cardiology,Beirut,Rafic Hariri Hospital,1450,4.7
+Dr. Sarah Nehme,Dermatology,Jounieh,Jounieh Skin Clinic,850,4.8
+Dr. Rami Fawaz,Orthopedics,Saida,Saida Orthopedic Center,1050,4.6
+Dr. Maya Saab,Gynecology,Zahle,Zahle Gynecology Clinic,900,4.5
+Dr. Fadi Khoury,Dentistry,Beirut,Bright Smile Clinic,400,4.3
+Dr. Rayan Mortada,ENT,Beirut,AUBMC,1000,4.8
+Dr. Leila Jabbour,Psychiatry,Beirut,LAU Medical Center,1600,4.9
+Dr. Tony Karam,General Surgery,Byblos,Ottoman Hospital,1500,4.6
+Dr. Mireille Chidiac,Endocrinology,Byblos,Byblos Endo Clinic,1200,4.4
+Dr. Rami Faraj,Cardiology,Tripoli,Tripoli Governmental Hospital,1150,4.5
+Dr. Dana Chammas,Dermatology,Baalbek,Baalbek Skin Center,750,4.7
+Dr. Samer Abou Samra,Neurology,Beirut,Mount Lebanon Hospital,1750,4.8
+Dr. Rita Barakat,Gynecology,Byblos,Byblos Medical Center,1300,4.6
+Dr. Hani Yammine,General Medicine,Beirut,Rafic Hariri Hospital,550,4.1
+Dr. Yara Daher,Cardiology,Beirut,Saint George Hospital,1250,4.5
+Dr. Elias Barhoum,Gastroenterology,Zahle,Zahle Digestive Center,1050,4.4
+Dr. Lamis Khouri,Neurology,Tripoli,North Care Hospital,1650,4.8
+Dr. Bahaa Aoun,Orthopedics,Beirut,Beirut Orthopedic Institute,1300,4.6
+Dr. Noura Iskandar,Endocrinology,Baalbek,Baalbek Medical Center,950,4.3
+Dr. Karim Fenianos,Pulmonology,Saida,South Health Center,900,4.5
+Dr. Dima Masri,Ophthalmology,Beirut,Cedar Eye Hospital,800,4.7
+Dr. Tarek Ghannam,Urology,Byblos,Byblos Uro Clinic,1400,4.4
+Dr. Lara Itani,Gynecology,Tyre,Tyre Women’s Hospital,1200,4.6
+Dr. Hisham Alameh,General Medicine,Nabatieh,Nabatieh Medical Center,600,4.2
+Dr. Rania Dergham,Cardiology,Jounieh,Keserwan Medical Center,1350,4.8
+Dr. Josephine Wakim,Allergy & Immunology,Beirut,Mount Lebanon Hospital,950,4.5
+Dr. Mohamad Qassar,General Surgery,Tripoli,Tripoli Governmental Hospital,1500,4.3
+Dr. Selma Chdid,Pediatrics,Saida,Saida Children’s Hospital,650,4.6
+Dr. Walid Farhat,ENT (Otolaryngology),Batroun,Batroun Medical Complex,900,4.4
+Dr. Dana Helou,Dermatology,Beirut,Glow Skin Center,850,4.9
+Dr. Fady Zeitoun,Rheumatology,Zgharta,Ehden Hospital,950,4.5
+Dr. Hiba Koury,Nephrology,Baalbek,Beqaa Renal Center,1150,4.4
+Dr. Ihab Skaff,Hepatology,Beirut,AUB Liver Clinic,1500,4.7
+Dr. Viviane Madi,Hematology,Beirut,Geitaoui Hospital,1450,4.6
+Dr. Rami Annan,Oncology,Beirut,Clemenceau Cancer Institute,2200,4.8
+Dr. Nour Chamoun,Psychiatry,Aley,Aley Serenity Clinic,1100,4.5
+Dr. Bilal Khatar,Orthopedics,Tyre,Tyre Ortho Center,1150,4.4
+Dr. Darine Bou Kheir,Endocrinology,Beirut,LAU Medical Center,1000,4.6
+Dr. Rached Tannous,Cardiology,Zgharta,North Heart Center,1250,4.3
+Dr. Pascale Tabet,Dentistry,Beirut,Smile Bright Studio,350,4.7
+Dr. Jamal Wehbe,Pulmonology,Nabatieh,Nabatieh Chest Clinic,950,4.5
+Dr. Nadine Saab,Dermatology,Jounieh,Coastal Skin House,820,4.6
+Dr. Rafi Taleb,Neurology,Saida,South Neuro Center,1700,4.7
+Dr. Mona Obeid,Gynecology,Baalbek,Baalbek Women’s Clinic,950,4.4
+Dr. Salim Daher,General Medicine,Tripoli,North Family Clinic,550,4.2
+Dr. Tania Rizk,Cardiology,Beirut,Heart Wellness Center,1450,4.8
+Dr. Selim Massaad,Orthopedics,Byblos,Phoenicia Sports Clinic,1250,4.5
+Dr. Aline Mourad,Ophthalmology,Zahle,Cedars Vision Center,780,4.5
+Dr. Wissam Habr,Urology,Saida,Harbor Uro Clinic,1350,4.4
+Dr. Georgina Bechara,Neurology,Beirut,Saint George Hospital,1750,4.9
+Dr. Dani Saba,General Surgery,Nabatieh,Nabatieh Surgical Center,1300,4.2
+Dr. Feryal Tarabay,Endocrinology,Tripoli,Tripoli Diabetes Clinic,920,4.3
+Dr. Amir Allam,Pediatrics,Byblos,Byblos Kids Clinic,620,4.7
+Dr. Hoda Ghosn,Allergy & Immunology,Beirut,Lebanon Allergy Institute,880,4.4
+Dr. Malek Rahbani,Gastroenterology,Saida,Coastline Digestive Center,1080,4.5
+Dr. Riwa Saadeh,Dentistry,Jounieh,Keserwan Dental Lounge,320,4.6
+Dr. Bashir Masry,Orthopedics,Baalbek,Beqaa Trauma Center,1180,4.3
+Dr. Sandra Nohra,Cardiology,Tripoli,North Cardio Institute,1320,4.5
+Dr. Jad Boustany,Hepatology,Beirut,Capital Liver Center,1550,4.7
+Dr. Perla Yammine,Ophthalmology,Beirut,Blue Cross Eye Unit,820,4.8
+Dr. Rony Gerges,Psychiatry,Zahle,Zahle Wellness Hospital,1150,4.6
+Dr. Meriam Akar,Dermatology,Tyre,Tyre Aesthetic Hub,760,4.5
+Dr. Amin Kassab,General Medicine,Jounieh,Harbor Primary Care,600,4.2
+Dr. Julia Sfeir,Orthopedics,Beirut,Rafic Hariri Hospital,1280,4.4
+Dr. Wael Assaf,Cardiology,Batroun,Batroun Heart Clinic,1150,4.3
+Dr. Lina Saliba,Gynecology,Tripoli,Tripoli Women’s Center,980,4.5
+Dr. Karim Hajjar,Pulmonology,Beirut,Cedar Lungs Hospital,990,4.6
+Dr. Sahar Nassar,Neurology,Tyre,South Brain Institute,1600,4.4
+Dr. Michel Samaha,Dermatology,Baalbek,Oasis Skin Center,780,4.5
+Dr. Jihane Aoun,Pediatrics,Aley,Aley Pediatric Hub,630,4.6
+Dr. Ahmad Ward,ENT (Otolaryngology),Tripoli,Tripoli ENT Center,870,4.3
+Dr. Tala Bitar,Allergy & Immunology,Byblos,Coastal Allergy Clinic,860,4.5
+Dr. Nadim Traboulsi,Gastroenterology,Beirut,Capital GI Institute,1400,4.7
+Dr. Rita Alwan,Hepatology,Saida,Saida Liver Clinic,1250,4.4
+Dr. Samer Daher,Orthopedics,Aley,Aley Ortho Center,1200,4.3
+Dr. Haneen Chami,Endocrinology,Beirut,Medina Hormone Clinic,970,4.6
+Dr. Walid Younes,Cardiology,Nabatieh,Nabatieh Heart House,1180,4.4
+Dr. Farah Kettaneh,Neurology,Batroun,Batroun Neuro Lab,1500,4.5
+Dr. Ibrahim Zogheib,Urology,Tripoli,North Uro Clinic,1380,4.4
+Dr. Rana Rached,Gynecology,Beirut,Saint Joseph Hospital,1500,4.7
+Dr. Khaled Chamas,General Medicine,Tyre,Tyre Family Center,580,4.1
+Dr. Sophia Alameddine,Ophthalmology,Saida,Saida Vision Clinic,760,4.5
+Dr. Chadi Noujaim,Rheumatology,Byblos,Byblos Joint Center,940,4.4
+Dr. Zeina Mansour,Cardiology,Beirut,Lebanon Heart Hub,1550,4.9
+Dr. Majed Barakat,Orthopedics,Tripoli,Tripoli Spine Institute,1420,4.6
+Dr. Samar Daou,Dentistry,Baalbek,Beqaa Smile Studio,310,4.3
+Dr. Khalil Daher,Psychiatry,Beirut,Urban Mind Clinic,1250,4.6
+Dr. Tania Jabbour,Endocrinology,Jounieh,Keserwan Hormone Center,930,4.5
+Dr. Gaby Salim,Gastroenterology,Batroun,Batroun Digestive House,1020,4.4
+Dr. Mireille Fakhry,Pediatrics,Nabatieh,Nabatieh Kids Clinic,640,4.5
+Dr. Omar Baz,ENT (Otolaryngology),Aley,Hill ENT Clinic,850,4.2
+Dr. Laura Chebli,Cardiology,Saida,Saida Heart Hospital,1270,4.6
+Dr. Roland Khawly,Orthopedics,Beirut,Midtown Ortho Center,1330,4.5
+Dr. Fatima Wehbe,Dermatology,Nabatieh,Nabatieh Skin Clinic,740,4.4
+Dr. Tony Sawan,General Surgery,Tripoli,North Surgical Hospital,1450,4.3
+Dr. Rana Bazzi,Ophthalmology,Beirut,OptiCare Pavilion,780,4.6
+Dr. Georges Kassim,Pulmonology,Zahle,Zahle Lung Clinic,970,4.4
+Dr. Nayla Choueiri,Neurology,Beirut,Helios Neuro Center,1820,4.8
+Dr. Fares Lakkis,Gynecology,Tyre,South Women’s Hospital,960,4.4
+Dr. Paula Fattouh,Dentistry,Beirut,Premier Dental Hub,360,4.7
+Dr. Jalal Issa,Cardiology,Byblos,Byblos Heart Center,1260,4.5
+Dr. Celine Daher,Rheumatology,Beirut,Rheuma Relief Clinic,980,4.5
+Dr. Walid Talhouk,Orthopedics,Zahle,Zahle Joint Institute,1180,4.4
+Dr. Samar Hitti,Endocrinology,Tripoli,Marada Wellness Center,950,4.4
+Dr. Nour Youssef,Hepatology,Beirut,Metn Liver Institute,1480,4.6
+Dr. Tarek Nassar,Gastroenterology,Tyre,Coastal Digestive Hospital,1150,4.4
+Dr. Aida Baradi,Pediatrics,Beirut,Cedar Kids Clinic,700,4.7
+Dr. Marwan Abillama,ENT (Otolaryngology),Saida,Saida ENT Center,890,4.5
+Dr. Leila Itani,Cardiology,Baalbek,Valley Heart Center,1220,4.3
+Dr. Sami Kanaan,Orthopedics,Batroun,Batroun Ortho Center,1120,4.2
+Dr. Mira Rassi,Neurology,Jounieh,Keserwan Neuro Care,1680,4.7
+Dr. Nour Tannoury,Dermatology,Tripoli,North Glow Clinic,780,4.5
+Dr. Jad Khoury,Urology,Beirut,Capital Urology Institute,1500,4.7
+Dr. Rana Soueidan,Gynecology,Aley,Aley Women’s Clinic,900,4.4
+Dr. Issam Helou,General Medicine,Byblos,Heritage Family Practice,620,4.2
+Dr. Rita Zoghbi,Ophthalmology,Baalbek,Valley Vision Clinic,750,4.3
+Dr. Pascal Mouawad,Rheumatology,Tripoli,Tripoli Arthritis Hub,960,4.4
+Dr. Karim Srour,Cardiology,Beirut,Infinity Heart Lab,1600,4.9
+Dr. Sana Abou Zeid,Orthopedics,Saida,Saida Bone Center,1150,4.3
+Dr. Malik Kassir,Dentistry,Tyre,Tyre Dental Studio,340,4.5
+Dr. Ghida Anis,Psychiatry,Tripoli,North Mind Center,1170,4.4
+Dr. Selim Osta,Endocrinology,Beirut,Beirut Metabolic Clinic,980,4.5
+Dr. Dalia Barakat,Gastroenterology,Byblos,Phoenicia Digestive Center,1120,4.5
+Dr. Tarek Haddad,Pulmonology,Baalbek,Beqaa Respiratory Clinic,930,4.3
+Dr. Yasmine Baroody,Pediatrics,Zahle,Zahle Children Clinic,610,4.4
+Dr. Omar Charaf,ENT (Otolaryngology),Beirut,Capital ENT Institute,950,4.6

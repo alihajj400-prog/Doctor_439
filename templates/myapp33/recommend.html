@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Doctor Recommendation Engine</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text",
+                         system-ui, -webkit-system-font, "Segoe UI", sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            background: radial-gradient(circle at top left, #32d486, #007a4a 40%, #013824 100%);
+            padding: 40px 0;
+            color: #0b1726;
+        }
+
+        .page-wrapper {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 28px 32px 36px;
+            background: rgba(250, 250, 250, 0.98);
+            border-radius: 28px;
+            box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
+        }
+
+        .top-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .title-block h1 {
+            font-size: 32px;
+            font-weight: 800;
+            letter-spacing: 0.02em;
+            color: #0a1e33;
+            margin-bottom: 4px;
+        }
+
+        .title-block p {
+            font-size: 14px;
+            color: #5f7189;
+        }
+
+        .btn-pill {
+            padding: 10px 20px;
+            border-radius: 999px;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: transform 0.1s ease, box-shadow 0.1s ease, background 0.2s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-secondary {
+            background: #e7f0ff;
+            color: #1652f0;
+            border: 1px solid #c3d5ff;
+            box-shadow: 0 6px 18px rgba(22, 82, 240, 0.18);
+        }
+
+        .btn-secondary:hover {
+            background: #d7e4ff;
+            transform: translateY(-1px);
+        }
+
+        .filter-card {
+            margin-top: 10px;
+            padding: 18px 20px 14px;
+            background: #f7fafc;
+            border-radius: 18px;
+            border: 1px solid #dde5f5;
+        }
+
+        .filter-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 14px 20px;
+            align-items: flex-end;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            min-width: 150px;
+            flex: 1;
+        }
+
+        .filter-group label {
+            font-size: 11px;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: #8693a6;
+            margin-bottom: 4px;
+            font-weight: 600;
+        }
+
+        select,
+        input[type="text"],
+        input[type="number"] {
+            border-radius: 999px;
+            border: 1px solid #d0d9eb;
+            padding: 7px 12px;
+            font-size: 13px;
+            outline: none;
+            background: white;
+            transition: border 0.15s ease, box-shadow 0.15s ease;
+        }
+
+        select:focus,
+        input[type="text"]:focus,
+        input[type="number"]:focus {
+            border-color: #1a73e8;
+            box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.15);
+        }
+
+        .search-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(90deg, #1ac568, #0f9d58);
+            color: white;
+            border: none;
+            padding: 9px 22px;
+            border-radius: 999px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 10px 24px rgba(15, 157, 88, 0.32);
+        }
+
+        .btn-primary:hover {
+            filter: brightness(1.05);
+            transform: translateY(-1px);
+        }
+
+        #chatbot-toggle {
+            position: fixed;
+            bottom: 24px;
+            left: 24px;
+            background: #22c55e;
+            color: white;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            font-size: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            z-index: 9999;
+        }
+
+        #chatbot-window {
+            position: fixed;
+            bottom: 100px;
+            left: 24px;
+            width: 380px;
+            height: 500px;
+            background: #f8fafc;
+            border-radius: 18px;
+            box-shadow: 0 12px 40px rgba(0,0,0,0.35);
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
+            z-index: 9999;
+            border: 1px solid rgba(15, 23, 42, 0.15);
+        }
+
+﻿        #chatbot-header {
+            background: linear-gradient(120deg, #22c55e, #16a34a);
+            color: white;
+            padding: 14px 16px;
+            font-weight: 700;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        #chatbot-body {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 14px;
+            gap: 10px;
+            background: linear-gradient(180deg, #f0fdf4 0%, #f8fafc 45%, #e5e7eb 100%);
+            min-height: 0;
+            overflow: hidden;
+        }
+
+        #chatbot-scroll-container {
+            flex: 1 1 100%;
+            min-height: 260px;
+            overflow-y: hidden;
+            display: flex;
+        }
+
+        #chatbot-messages {
+            flex: 1;
+            min-height: 0;
+            padding: 12px;
+            overflow-y: auto;
+            font-size: 14px;
+            border-radius: 16px;
+            background: rgba(255, 255, 255, 0.85);
+            border: 1px solid rgba(148, 163, 184, 0.35);
+        }
+
+        .chatbot-quick,
+        .chatbot-surgery,
+        .chatbot-city,
+        .chatbot-budget {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            max-height: 56px;
+            overflow-y: auto;
+            padding-right: 4px;
+        }
+
+        .chatbot-quick button,
+        .chatbot-surgery button,
+        .chatbot-city button,
+        .chatbot-budget button {
+            border: 1px solid rgba(148, 163, 184, 0.6);
+            border-radius: 999px;
+            background: white;
+            color: #0f172a;
+            font-size: 12px;
+            padding: 4px 12px;
+            cursor: pointer;
+        }
+
+        .chatbot-tip {
+            font-size: 12px;
+            color: #0f172a;
+            background: rgba(34, 197, 94, 0.12);
+            padding: 8px 10px;
+            border-radius: 10px;
+            border: 1px solid rgba(34, 197, 94, 0.3);
+        }
+
+        .chatbot-msg {
+            background: #e2e8f0;
+            padding: 8px 12px;
+            border-radius: 12px;
+            margin-bottom: 6px;
+            max-width: 80%;
+            white-space: pre-wrap;
+        }
+
+        .chatbot-msg.user {
+            background: #22c55e;
+            color: white;
+            margin-left: auto;
+        }
+
+        #chatbot-input-box {
+            display: flex;
+            border-top: 1px solid #cbd5e1;
+            background: #f8fafc;
+            padding: 10px;
+            gap: 10px;
+            align-items: center;
+        }
+
+        #chatbot-input {
+            flex: 1;
+            padding: 12px;
+            border-radius: 999px;
+            border: none;
+            outline: none;
+            font-size: 14px;
+            background: rgba(15, 23, 42, 0.06);
+            color: #0f172a;
+        }
+
+        #chatbot-send {
+            background: #22c55e;
+            border: none;
+            padding: 10px 18px;
+            color: white;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            border-radius: 999px;
+        }
+
+        #chatbot-status {
+            font-size: 11px;
+            color: #475569;
+        }
+
+        .results-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 22px 2px 10px;
+        }
+
+        .results-header h2 {
+            font-size: 18px;
+            font-weight: 700;
+            color: #142133;
+        }
+
+        .badge {
+            font-size: 12px;
+            padding: 4px 10px;
+            border-radius: 999px;
+            background: #e6f4ea;
+            color: #0f9d58;
+            border: 1px solid #b8e1c6;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0 8px;
+            margin-top: 4px;
+        }
+
+        thead th {
+            font-size: 12px;
+            text-align: left;
+            padding: 8px 12px;
+            color: #8b97aa;
+            font-weight: 600;
+        }
+
+        tbody tr {
+            background: #ffffff;
+            box-shadow: 0 4px 14px rgba(15, 23, 42, 0.06);
+            border-radius: 14px;
+            overflow: hidden;
+        }
+
+        tbody tr:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 8px 24px rgba(15, 23, 42, 0.10);
+        }
+
+        .fav-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 11px;
+            border-radius: 999px;
+            padding: 3px 9px;
+            background: rgba(251, 191, 36, 0.15);
+            color: #b45309;
+            margin-left: 6px;
+        }
+
+        tbody td {
+            padding: 10px 12px;
+            font-size: 13px;
+            color: #1f2937;
+            border-top: 1px solid #eef2f7;
+            border-bottom: 1px solid #eef2f7;
+        }
+
+        tbody td:first-child {
+            border-left: 1px solid #eef2f7;
+            border-radius: 12px 0 0 12px;
+        }
+
+        tbody td:last-child {
+            border-right: 1px solid #eef2f7;
+            border-radius: 0 12px 12px 0;
+        }
+
+        .doctor-name a {
+            font-weight: 600;
+            color: #1652f0;
+            text-decoration: none;
+        }
+
+        .doctor-name a:hover {
+            text-decoration: underline;
+        }
+
+        .rating-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            border-radius: 999px;
+            background: #fff8dd;
+            border: 1px solid #f6e2a3;
+            font-weight: 600;
+            font-size: 12px;
+            color: #b38707;
+        }
+
+        .rating-pill .star {
+            font-size: 13px;
+        }
+
+        .fees-cell {
+            font-weight: 600;
+        }
+
+        .muted {
+            color: #9aa4b6;
+            font-size: 13px;
+            margin-top: 6px;
+        }
+
+        @media (max-width: 900px) {
+            .page-wrapper {
+                margin: 0 16px;
+                padding: 20px 18px 26px;
+            }
+
+            .top-row {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .filter-row {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="page-wrapper">
+    <div class="top-row">
+        <div class="title-block">
+            <h1>Doctor Recommendation Engine</h1>
+            <p>Filter Lebanon doctors by city, specialty, fees and rating.</p>
+        </div>
+
+        <div style="display:flex;gap:10px;flex-wrap:wrap;">
+            <a href="{% url 'home' %}" class="btn-pill btn-secondary">← Back to Doctor Manager</a>
+            <a href="{% url 'favorite_list' %}" class="btn-pill btn-secondary">Shortlist ({{ favorites|length }})</a>
+            <a href="{% url 'health_hub' %}" class="btn-pill btn-secondary">Health Hub</a>
+        </div>
+    </div>
+
+    <!-- FILTERS -->
+    <form method="get" class="filter-card">
+        <div class="filter-row">
+            <div class="filter-group" style="flex: 1 1 200px;">
+                <label for="search">Doctor Name</label>
+                <input type="text" name="search" id="search" value="{{ search }}" placeholder="Search by name">
+            </div>
+            <!-- City -->
+            <div class="filter-group">
+                <label for="city">City</label>
+                <select name="city" id="city">
+                    <option value="" {% if city == "" %}selected{% endif %}>Any</option>
+                    {% for c in city_choices %}
+                        <option value="{{ c }}" {% if city == c %}selected{% endif %}>{{ c }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Specialty -->
+            <div class="filter-group">
+                <label for="specialty">Specialty</label>
+                <select name="specialty" id="specialty">
+                    <option value="" {% if specialty == "" %}selected{% endif %}>Any</option>
+                    {% for s in specialty_choices %}
+                        <option value="{{ s }}" {% if specialty == s %}selected{% endif %}>{{ s }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Max Fees -->
+            <div class="filter-group">
+                <label for="max_fees">Max Fees</label>
+                <input
+                    type="number"
+                    name="max_fees"
+                    id="max_fees"
+                    placeholder="e.g. 1500"
+                    value="{{ max_fees }}">
+            </div>
+
+            <!-- Min Rating -->
+            <div class="filter-group">
+                <label for="min_rating">Min Rating</label>
+                <input
+                    type="number"
+                    step="0.1"
+                    min="0"
+                    max="5"
+                    name="min_rating"
+                    id="min_rating"
+                    placeholder="e.g. 4.5"
+                    value="{{ min_rating }}">
+            </div>
+
+            <!-- Sort By -->
+            <div class="filter-group">
+                <label for="sort">Sort By</label>
+                <select name="sort" id="sort">
+                    <option value="rating_desc" {% if sort == "rating_desc" %}selected{% endif %}>
+                        Rating (High → Low)
+                    </option>
+                    <option value="rating_asc" {% if sort == "rating_asc" %}selected{% endif %}>
+                        Rating (Low → High)
+                    </option>
+                    <option value="fees_asc" {% if sort == "fees_asc" %}selected{% endif %}>
+                        Fees (Low → High)
+                    </option>
+                    <option value="fees_desc" {% if sort == "fees_desc" %}selected{% endif %}>
+                        Fees (High → Low)
+                    </option>
+                </select>
+            </div>
+
+            <!-- Search button -->
+            <div class="search-actions">
+                <button type="submit" class="btn-primary">Search</button>
+            </div>
+        </div>
+    </form>
+
+    <!-- RESULTS -->
+    <div class="results-header">
+        <h2>Results</h2>
+        <span class="badge">
+            {% if results %}
+                {{ results|length }} doctor{{ results|length|pluralize }} found
+            {% else %}
+                No doctors match the filters
+            {% endif %}
+        </span>
+    </div>
+
+    {% if results %}
+        <table>
+            <thead>
+            <tr>
+                <th>Name</th>
+                <th>Specialty</th>
+                <th>City</th>
+                <th>Hospital</th>
+                <th>Fees</th>
+                <th>Rating</th>
+                <th>Shortlist</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for doctor in results %}
+                <tr>
+                    <td class="doctor-name">
+                        {% if doctor.id %}
+                            <a href="{% url 'doctor_detail' doctor.id %}">{{ doctor.name }}</a>
+                        {% else %}
+                            {{ doctor.name }}
+                        {% endif %}
+                        {% if doctor.id in favorites %}
+                            <span class="fav-pill">★ Favorite</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ doctor.specialty }}</td>
+                    <td>{{ doctor.city }}</td>
+                    <td>{{ doctor.hospital }}</td>
+                    <td class="fees-cell">${{ doctor.fees }}</td>
+                    <td>
+                        <span class="rating-pill">
+                            <span class="star">★</span>
+                            {{ doctor.rating }}
+                        </span>
+                    </td>
+                    <td>
+                        <form method="post" action="{% url 'toggle_favorite' doctor.id %}">
+                            {% csrf_token %}
+                            <input type="hidden" name="next" value="{{ request.get_full_path }}">
+                            <button type="submit" class="btn-pill btn-secondary" style="padding:6px 12px;">
+                                {% if doctor.id in favorites %}Remove{% else %}Favorite{% endif %}
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p class="muted">Try widening your filters (for example, remove max fees or lower the minimum rating).</p>
+    {% endif %}
+</div>
+
+<div id="chatbot-toggle">💬</div>
+
+<div id="chatbot-window">
+    <div id="chatbot-header">
+        <span>Doctor Assistant</span>
+        <span id="chatbot-close" style="cursor:pointer;font-size:20px;">×</span>
+    </div>
+    <div id="chatbot-body">
+        <div class="chatbot-tip">
+            <strong>Tip:</strong> Describe symptoms + add a city and budget to get the closest specialists.
+        </div>
+        <div class="chatbot-quick">
+            <button type="button" data-query="Sharp chest pain in Beirut">Chest pain</button>
+            <button type="button" data-query="Persistent toothache Tripoli">Toothache</button>
+            <button type="button" data-query="Skin rash on arms Saida">Skin rash</button>
+            <button type="button" data-query="Child fever in Zahle">Child fever</button>
+            <button type="button" data-query="Shortness of breath in Tyre">Breathing issue</button>
+            <button type="button" data-query="Sudden dizziness Beirut">Dizziness</button>
+        </div>
+        <div class="chatbot-surgery">
+            <button type="button" data-query="Need nose surgery in Beirut">Nose surgery</button>
+            <button type="button" data-query="Brain surgery opinion Tripoli">Brain surgery</button>
+            <button type="button" data-query="Heart bypass consultation Saida">Heart surgery</button>
+            <button type="button" data-query="Shoulder ligament repair in Jounieh">Shoulder injury</button>
+            <button type="button" data-query="Severe ankle sprain Tyre">Ankle injury</button>
+        </div>
+        <div class="chatbot-city">
+            <button type="button" data-city="Beirut">Beirut</button>
+            <button type="button" data-city="Tripoli">Tripoli</button>
+            <button type="button" data-city="Saida">Saida</button>
+            <button type="button" data-city="Zahle">Zahle</button>
+            <button type="button" data-city="Tyre">Tyre</button>
+            <button type="button" data-city="Jounieh">Jounieh</button>
+        </div>
+        <div class="chatbot-budget">
+            <button type="button" data-budget="under 300">$300 & under</button>
+            <button type="button" data-budget="under 600">$600 & under</button>
+            <button type="button" data-budget="under 1000">$1000 & under</button>
+            <button type="button" data-budget="budget 1500">Budget 1500</button>
+        </div>
+        <div id="chatbot-scroll-container">
+            <div id="chatbot-messages">
+                <div class="chatbot-msg">
+                    👋 Hi! Describe symptoms, add a city or budget, and I’ll show matching doctors from your directory.
+                </div>
+            </div>
+        </div>
+        <div id="chatbot-status">Waiting for a question…</div>
+    </div>
+    <div id="chatbot-input-box">
+        <input id="chatbot-input" type="text" placeholder="Example: dull shoulder pain in Jounieh">
+        <button id="chatbot-send" type="button">Send</button>
+    </div>
+</div>
+
+<script>
+    const toggleBtn = document.getElementById('chatbot-toggle');
+    const chatWindow = document.getElementById('chatbot-window');
+    const closeBtn  = document.getElementById('chatbot-close');
+    const messages  = document.getElementById('chatbot-messages');
+    const input     = document.getElementById('chatbot-input');
+    const sendBtn   = document.getElementById('chatbot-send');
+    const quickButtons = document.querySelectorAll('.chatbot-quick button');
+    const surgeryButtons = document.querySelectorAll('.chatbot-surgery button');
+    const cityButtons = document.querySelectorAll('.chatbot-city button');
+    const budgetButtons = document.querySelectorAll('.chatbot-budget button');
+    const statusLabel = document.getElementById('chatbot-status');
+
+    toggleBtn.onclick = () => {
+        chatWindow.style.display =
+            chatWindow.style.display === 'flex' ? 'none' : 'flex';
+        if (chatWindow.style.display === 'flex') {
+            input.focus();
+        }
+    };
+    closeBtn.onclick = () => { chatWindow.style.display = 'none'; };
+
+    const addMessage = (text, type = '') => {
+        const div = document.createElement('div');
+        div.className = `chatbot-msg ${type}`;
+        div.innerText = text;
+        messages.appendChild(div);
+        messages.scrollTop = messages.scrollHeight;
+        return div;
+    };
+
+    const updateMessage = (node, text) => {
+        if (!node) return;
+        node.innerText = text;
+        messages.scrollTop = messages.scrollHeight;
+    };
+
+    function setStatus(text) {
+        if (statusLabel) {
+            statusLabel.textContent = text;
+        }
+    }
+
+    function updateStatusFromReply(reply = '') {
+        const match = reply.match(/Recommended specialty:\s*\*{0,2}([^*\n]+)/i);
+        if (match && match[1]) {
+            setStatus(`Latest specialty: ${match[1].trim()}`);
+        } else {
+            setStatus('Ready for another question.');
+        }
+    }
+
+    async function sendMessage() {
+        const text = input.value.trim();
+        if (!text) return;
+
+        addMessage(text, 'user');
+        const thinking = addMessage('Thinking…', '');
+        input.value = '';
+        input.focus();
+        sendBtn.disabled = true;
+        setStatus('Matching specialty and nearby doctors…');
+
+        try {
+            const response = await fetch("{% url 'chatbot' %}", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded",
+                },
+                body: new URLSearchParams({message: text})
+            });
+            const data = await response.json();
+            updateMessage(thinking, data?.reply || 'I could not understand that.');
+            updateStatusFromReply(data?.reply);
+        } catch (err) {
+            updateMessage(thinking, 'Unable to reach the assistant. Try again.');
+            setStatus('Connection error. Please retry.');
+        } finally {
+            sendBtn.disabled = false;
+        }
+    }
+
+    sendBtn.addEventListener('click', sendMessage);
+    input.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter') {
+            event.preventDefault();
+            sendMessage();
+        }
+    });
+
+    const runTemplateMessage = (text) => {
+        input.value = text || '';
+        input.focus();
+        sendMessage();
+    };
+
+    quickButtons.forEach((btn) => {
+        btn.addEventListener('click', () => runTemplateMessage(btn.dataset.query || ''));
+    });
+
+    surgeryButtons.forEach((btn) => {
+        btn.addEventListener('click', () => runTemplateMessage(btn.dataset.query || ''));
+    });
+
+    cityButtons.forEach((btn) => {
+        btn.addEventListener('click', () => {
+            const city = btn.dataset.city || '';
+            if (!city) return;
+            const current = input.value.trim();
+            if (current.toLowerCase().includes(city.toLowerCase())) {
+                input.focus();
+                return;
+            }
+            input.value = current ? `${current} ${city}` : city;
+            input.focus();
+        });
+    });
+
+    budgetButtons.forEach((btn) => {
+        btn.addEventListener('click', () => {
+            const phrase = btn.dataset.budget || '';
+            if (!phrase) return;
+            const current = input.value.trim();
+            if (current.toLowerCase().includes(phrase.toLowerCase())) {
+                input.focus();
+                return;
+            }
+            input.value = current ? `${current} ${phrase}` : phrase;
+            input.focus();
+        });
+    });
+</script>
+</body>
+</html>

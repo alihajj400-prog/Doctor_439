@@ -1,0 +1,6 @@
+venv/
+.env
+mysite33/.env
+__pycache__/
+*.sqlite3
+*.pyc

@@ -313,19 +313,19 @@
 
     #chatbot-window {
         position: fixed;
-        bottom: 100px;
-        left: 24px;
+        bottom: 40px;
+        left: 40px;
         right: auto;
-        width: 400px;
-        height: 520px;
+        width: 600px;
+        height: 650px;
         background: #f8fafc;
-        border-radius: 20px;
-        box-shadow: 0 12px 40px rgba(0,0,0,0.35);
+        border-radius: 24px;
+        box-shadow: 0 20px 50px rgba(0,0,0,0.4);
         display: none;
         flex-direction: column;
         overflow: hidden;
         z-index: 9999;
-        border: 1px solid rgba(15, 23, 42, 0.15);
+        border: 2px solid rgba(15, 23, 42, 0.2);
     }
 
     #chatbot-header {
@@ -390,7 +390,7 @@
 
     #chatbot-scroll-container {
         flex: 1 1 100%;
-        min-height: 280px;
+        min-height: 440px;
         overflow-y: hidden;
         display: flex;
     }
@@ -721,9 +721,9 @@
     </div>
 
     <div id="chatbot-body">
-        <div class="chatbot-tip">
-            <strong>Tip:</strong> Mention symptoms + city for the closest specialty (e.g. "throbbing toothache in Beirut").
-        </div>
+                <div class="chatbot-tip">
+                    <strong>Tip:</strong> Mention symptoms + city + budget (e.g. "toothache Beirut under 600") for the closest specialty.
+                </div>
         <div class="chatbot-quick">
             <button type="button" data-query="Sharp chest pain in Beirut">Chest pain</button>
             <button type="button" data-query="Persistent toothache Tripoli">Toothache</button>

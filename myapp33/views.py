@@ -189,47 +189,93 @@ SPECIALTY_ALIASES = {
     "appendicitis": "General Surgery",
     "gallstones": "General Surgery",
     "hernia": "General Surgery",
+    "appendix": "General Surgery",
+    "laparoscopic": "General Surgery",
     "burn": "Plastic Surgery",
     "nosebleed": "ENT",
     "eczema": "Dermatology",
     "psoriasis": "Dermatology",
     "melanoma": "Dermatology",
+    "acne": "Dermatology",
+    "rosacea": "Dermatology",
     "migraine": "Neurology",
     "epilepsy": "Neurology",
     "stroke": "Neurology",
+    "vertigo": "Neurology",
+    "numbness": "Neurology",
     "diabetes": "Endocrinology",
     "thyroiditis": "Endocrinology",
     "pcos": "Endocrinology",
+    "hyperthyroid": "Endocrinology",
+    "hypothyroid": "Endocrinology",
     "covid": "Infectious Disease",
     "influenza": "Infectious Disease",
+    "malaria": "Infectious Disease",
+    "tuberculosis": "Infectious Disease",
     "bronchitis": "Pulmonology",
     "asthma": "Pulmonology",
     "pneumonia": "Pulmonology",
+    "copd": "Pulmonology",
     "kidney stone": "Urology",
     "prostatitis": "Urology",
     "uti": "Urology",
+    "bladder infection": "Urology",
+    "incontinence": "Urology",
     "fertility": "Gynecology",
     "pregnancy": "Gynecology",
     "infertility": "Gynecology",
+    "endometriosis": "Gynecology",
+    "ovarian cyst": "Gynecology",
     "arthritis": "Rheumatology",
     "lupus": "Rheumatology",
     "gout": "Rheumatology",
+    "fibromyalgia": "Rheumatology",
     "anemia": "Hematology",
+    "sickle cell": "Hematology",
     "leukemia": "Oncology",
     "tumor": "Oncology",
+    "carcinoma": "Oncology",
     "depression": "Psychiatry",
     "anxiety": "Psychiatry",
     "adhd": "Psychiatry",
+    "bipolar": "Psychiatry",
     "sciatica": "Orthopedics",
     "fracture": "Orthopedics",
     "back injury": "Orthopedics",
+    "sprain": "Orthopedics",
+    "tendonitis": "Orthopedics",
+    "meniscus": "Orthopedics",
     "ulcer": "Gastroenterology",
     "ibs": "Gastroenterology",
+    "reflux": "Gastroenterology",
+    "colitis": "Gastroenterology",
     "cirrhosis": "Hepatology",
     "jaundice": "Hepatology",
     "allergy": "Allergy & Immunology",
     "hives": "Allergy & Immunology",
+    "sinusitis": "ENT",
+    "tonsillitis": "ENT",
+    "ear infection": "ENT",
+    "cataract": "Ophthalmology",
+    "glaucoma": "Ophthalmology",
+    "conjunctivitis": "Ophthalmology",
+    "dental pain": "Dentistry",
+    "root canal": "Dentistry",
+    "gum disease": "Dentistry",
+    "obesity": "Endocrinology",
+    "weight gain": "Endocrinology",
+    "infant fever": "Pediatrics",
+    "child cough": "Pediatrics",
+    "development delay": "Pediatrics",
     "sepsis": "Emergency Medicine",
+    "sepsis": "Emergency Medicine",
+    "trauma": "Emergency Medicine",
+    "chest trauma": "Cardiothoracic Surgery",
+    "bypass": "Cardiothoracic Surgery",
+    "valve disease": "Cardiothoracic Surgery",
+    "brain tumor": "Neurosurgery",
+    "spinal cord injury": "Neurosurgery",
+    "pituitary tumor": "Neurosurgery",
 }
 
 SMART_TIPS = {
@@ -333,14 +379,28 @@ def detect_city(user_msg: str):
 def detect_budget(user_msg: str):
     text = user_msg.lower()
     match = re.search(r"(?:under|below|less than)\s*\$?\s*(\d{2,5})", text)
-    if not match:
-        match = re.search(r"(?:budget|fees?)\s*(?:around|about|near)?\s*\$?\s*(\d{2,5})", text)
     if match:
         try:
             amount = int(match.group(1))
-            return amount, f"Budget ≤ ${amount}"
+            return ("lte", amount, f"Budget ≤ ${amount}")
         except ValueError:
-            return None
+            pass
+
+    match_over = re.search(r"(?:over|above|greater than|more than)\s*\$?\s*(\d{2,5})", text)
+    if match_over:
+        try:
+            amount = int(match_over.group(1))
+            return ("gte", amount, f"Budget ≥ ${amount}")
+        except ValueError:
+            pass
+
+    match_generic = re.search(r"(?:budget|fees?)\s*(?:around|about|near)?\s*\$?\s*(\d{2,5})", text)
+    if match_generic:
+        try:
+            amount = int(match_generic.group(1))
+            return ("lte", amount, f"Budget around ${amount}")
+        except ValueError:
+            pass
     return None
 
 
@@ -370,8 +430,11 @@ def chatbot(request):
             notes = []
 
             if budget_info:
-                max_fee, msg = budget_info
-                doctors_qs = doctors_qs.filter(fees__lte=max_fee)
+                comparison, value, msg = budget_info
+                if comparison == "gte":
+                    doctors_qs = doctors_qs.filter(fees__gte=value)
+                else:
+                    doctors_qs = doctors_qs.filter(fees__lte=value)
                 notes.append(msg)
 
             if city:
@@ -411,9 +474,11 @@ def chatbot(request):
             )
         else:
             reply = (
-                "Hi there! Tell me about a symptom, a body part, or the type of doctor you want "
-                "(for example 'rash on arm', 'dentist in Beirut', 'budget under 600') and I’ll "
-                "point you to the best fits."
+                "Hello! For me to serve you, please include:\n"
+                "• a symptom or body part (e.g., 'rash on arm', 'knee injury')\n"
+                "• optional city (e.g., 'in Beirut', 'Tripoli')\n"
+                "• optional budget (e.g., 'under 600')\n"
+                "Send a message like “toothache in Saida under 500” and I’ll return the best specialty and doctors."
             )
 
         return JsonResponse({"reply": reply})

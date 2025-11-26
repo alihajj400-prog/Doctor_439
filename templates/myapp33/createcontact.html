@@ -540,6 +540,7 @@
                 <form action="{% url 'recommend_doctors' %}" method="get">
                     <button type="submit" class="btn-link">Open Recommendation Engine →</button>
                 </form>
+                <a class="btn-link" href="{% url 'intake_wizard' %}">Guided Intake Wizard</a>
                 <a class="btn-link" href="{% url 'favorite_list' %}">My Shortlist ({{ favorites|length }})</a>
                 <a class="btn-link" href="{% url 'health_hub' %}">Health Hub</a>
 

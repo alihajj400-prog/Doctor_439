@@ -1,11 +1,18 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
+from django.urls import reverse
 from django.contrib import messages
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 
 from .models import Contact
-from .forms import ContactForm, AppointmentRequestForm
+from .forms import (
+    ContactForm,
+    AppointmentRequestForm,
+    IntakeSymptomForm,
+    IntakeDetailsForm,
+    IntakeUrgencyForm,
+)
 
 import csv
 import os
@@ -326,6 +333,13 @@ DEFAULT_SPECIALTIES = [rule["name"] for rule in SPECIALTY_RULES[:8]]
 
 def detect_specialty(user_msg: str):
     text = user_msg.lower()
+    stripped = text.strip()
+    if len(stripped) <= 3:
+        return None
+
+    quick_greetings = {"hi", "hello", "hey", "hola", "bonjour"}
+    if stripped in quick_greetings:
+        return None
 
     # 1) direct specialty name
     for rule in SPECIALTY_RULES:
@@ -362,8 +376,8 @@ def detect_specialty(user_msg: str):
             specialty_name = SPECIALTY_ALIASES[close[0]]
             return SPECIALTY_NAME_MAP.get(specialty_name.lower())
 
-    # 6) default
-    return SPECIALTY_NAME_MAP.get("general medicine")
+    # 6) no match
+    return None
 
 
 def detect_city(user_msg: str):
@@ -404,6 +418,75 @@ def detect_budget(user_msg: str):
     return None
 
 
+def build_recommendation_details(user_msg: str):
+    details = {"input": user_msg, "matched": False}
+    rule = detect_specialty(user_msg)
+    city = detect_city(user_msg)
+    budget_info = detect_budget(user_msg)
+
+    if rule:
+        specialty = rule["name"]
+        answer = rule["tip"]
+        doctors_qs = Contact.objects.filter(specialty__icontains=specialty)
+        notes = []
+
+        if budget_info:
+            comparison, value, msg = budget_info
+            if comparison == "gte":
+                doctors_qs = doctors_qs.filter(fees__gte=value)
+            else:
+                doctors_qs = doctors_qs.filter(fees__lte=value)
+            notes.append(msg)
+
+        if city:
+            city_matches = doctors_qs.filter(city__icontains=city)
+            if city_matches.exists():
+                doctors_qs = city_matches
+                notes.append(f"Showing doctors near {city}.")
+            else:
+                notes.append(
+                    f"No saved {specialty} doctors in {city}, so here are the top-rated options."
+                )
+        else:
+            notes.append("Showing top matches from your directory.")
+
+        doctors = doctors_qs.order_by("-rating")[:5]
+        if doctors:
+            doctor_text = "\n".join(
+                f"• **{d.name}** – {d.city}, {d.hospital}, Rating: {d.rating} ⭐"
+                for d in doctors
+            )
+        else:
+            doctor_text = "No doctors saved yet for this specialty."
+
+        smart_tip = SMART_TIPS.get(specialty, SMART_TIPS["General Medicine"])
+        checklist_text = "\n".join(f"- {item}" for item in smart_tip.get("checklist", []))
+        note_text = "\n".join(f"• {n}" for n in notes if n)
+
+        details.update(
+            {
+                "matched": True,
+                "specialty": specialty,
+                "answer": answer,
+                "note_text": note_text,
+                "doctor_text": doctor_text,
+                "tip": smart_tip.get("tip"),
+                "checklist": checklist_text,
+                "doctors": doctors,
+            }
+        )
+    else:
+        details["fallback"] = (
+            "Hello! For me to serve you, please include:\n"
+            "• a symptom or body part (e.g., 'rash on arm', 'knee injury')\n"
+            "• optional city (e.g., 'in Beirut', 'Tripoli')\n"
+            "• optional budget (e.g., 'under 600')\n"
+            "Send a message like “toothache in Saida under 500” and I’ll return the best specialty and doctors."
+        )
+
+    return details
+
+
 # -------------------------------------------------------
 # CHATBOT (POST from JS) – CSRF exempt
 # -------------------------------------------------------
@@ -417,69 +500,18 @@ def chatbot(request):
         return JsonResponse({"reply": "Please type a message."})
 
     try:
-        rule = detect_specialty(user_msg)
-        city = detect_city(user_msg)
-        budget_info = detect_budget(user_msg)
-
-        if rule:
-            specialty = rule["name"]
-            answer = rule["tip"]
-
-            doctors_qs = Contact.objects.filter(specialty__icontains=specialty)
-
-            notes = []
-
-            if budget_info:
-                comparison, value, msg = budget_info
-                if comparison == "gte":
-                    doctors_qs = doctors_qs.filter(fees__gte=value)
-                else:
-                    doctors_qs = doctors_qs.filter(fees__lte=value)
-                notes.append(msg)
-
-            if city:
-                city_matches = doctors_qs.filter(city__icontains=city)
-                if city_matches.exists():
-                    doctors_qs = city_matches
-                    notes.append(f"Showing doctors near {city}.")
-                else:
-                    notes.append(
-                        f"No saved {specialty} doctors in {city}, so here are the top-rated options."
-                    )
-            else:
-                notes.append("Showing top matches from your directory.")
-
-            doctors = doctors_qs.order_by("-rating")[:5]
-
-            if doctors:
-                doc_lines = [
-                    f"• **{d.name}** – {d.city}, {d.hospital}, Rating: {d.rating} ⭐"
-                    for d in doctors
-                ]
-                doctor_text = "\n".join(doc_lines)
-            else:
-                doctor_text = "No doctors saved yet for this specialty."
-
-            note_text = "\n".join(f"• {n}" for n in notes if n)
-            smart_tip = SMART_TIPS.get(specialty, SMART_TIPS["General Medicine"])
-            checklist = "\n".join(f"- {item}" for item in smart_tip.get("checklist", []))
-
+        details = build_recommendation_details(user_msg)
+        if details.get("matched"):
             reply = (
-                f"{answer}\n\n"
-                f"{note_text}\n\n"
-                f"**Recommended specialty:** {specialty}\n\n"
-                f"**Top doctors in our directory:**\n{doctor_text}\n\n"
-                f"**AI health tip:** {smart_tip.get('tip')}\n"
-                f"**Preparation checklist:**\n{checklist}"
+                f"{details['answer']}\n\n"
+                f"{details['note_text']}\n\n"
+                f"**Recommended specialty:** {details['specialty']}\n\n"
+                f"**Top doctors in our directory:**\n{details['doctor_text']}\n\n"
+                f"**AI health tip:** {details['tip']}\n"
+                f"**Preparation checklist:**\n{details['checklist']}"
             )
         else:
-            reply = (
-                "Hello! For me to serve you, please include:\n"
-                "• a symptom or body part (e.g., 'rash on arm', 'knee injury')\n"
-                "• optional city (e.g., 'in Beirut', 'Tripoli')\n"
-                "• optional budget (e.g., 'under 600')\n"
-                "Send a message like “toothache in Saida under 500” and I’ll return the best specialty and doctors."
-            )
+            reply = details.get("fallback", "Please try again with more details.")
 
         return JsonResponse({"reply": reply})
     except Exception as e:
@@ -528,6 +560,80 @@ def home(request):
             "contacts": contacts,
             "favorites": favorites,
             "search": query,
+        },
+    )
+
+
+def intake_wizard(request):
+    if request.GET.get("reset"):
+        request.session.pop("intake_data", None)
+        return redirect("intake_wizard")
+
+    data = request.session.get("intake_data", {})
+    step = int(request.GET.get("step", 1))
+    if step not in (1, 2, 3, 4):
+        step = 1
+
+    if step > 1 and not data.get("symptoms"):
+        return redirect(f"{reverse('intake_wizard')}?step=1")
+    if step > 2 and "budget_direction" not in data and "city" not in data and "budget_amount" not in data:
+        return redirect(f"{reverse('intake_wizard')}?step=2")
+
+    form = None
+    details = None
+    summary_text = ""
+
+    if step == 1:
+        if request.method == "POST":
+            form = IntakeSymptomForm(request.POST)
+            if form.is_valid():
+                data.update(form.cleaned_data)
+                request.session["intake_data"] = data
+                return redirect(f"{reverse('intake_wizard')}?step=2")
+        else:
+            form = IntakeSymptomForm(initial=data)
+
+    elif step == 2:
+        if request.method == "POST":
+            form = IntakeDetailsForm(request.POST)
+            if form.is_valid():
+                clean = form.cleaned_data
+                data.update(clean)
+                request.session["intake_data"] = data
+                return redirect(f"{reverse('intake_wizard')}?step=3")
+        else:
+            form = IntakeDetailsForm(initial=data)
+
+    elif step == 3:
+        if request.method == "POST":
+            form = IntakeUrgencyForm(request.POST)
+            if form.is_valid():
+                data.update(form.cleaned_data)
+                request.session["intake_data"] = data
+                return redirect(f"{reverse('intake_wizard')}?step=4")
+        else:
+            form = IntakeUrgencyForm(initial=data)
+
+    else:
+        summary_text = data.get("symptoms", "")
+        if data.get("duration"):
+            summary_text += f" (duration: {data['duration']})"
+        if data.get("city"):
+            summary_text += f" in {data['city']}"
+        if data.get("budget_amount"):
+            direction = data.get("budget_direction") or "under"
+            summary_text += f" {direction} {data['budget_amount']}"
+        details = build_recommendation_details(summary_text)
+
+    return render(
+        request,
+        "myapp33/intake_wizard.html",
+        {
+            "step": step,
+            "form": form,
+            "wizard_data": data,
+            "details": details,
+            "summary_input": summary_text,
         },
     )
 
